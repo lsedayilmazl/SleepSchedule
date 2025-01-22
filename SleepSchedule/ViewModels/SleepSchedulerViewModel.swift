@@ -5,6 +5,7 @@
 //  Created by seda yılmaz on 21.01.2025.
 //
 
+
 import Foundation
 import UserNotifications
 
@@ -15,7 +16,22 @@ class SleepSchedulerViewModel {
         sleepSchedule = SleepSchedule(startTime: start, endTime: end)
         scheduleNotifications()
     }
+//Toplam uyunulacak saat hesabı için
+    func calculateSleepDuration(start: Date, end: Date) -> (hours: Int, minutes: Int) {
+        let calendar = Calendar.current
+        var components = calendar.dateComponents([.hour, .minute], from: start, to: end)
+        
+        // Eğer fark negatifse, bitiş saatine bir gün ekle
+        if components.hour! < 0 || components.minute! < 0 {
+            let adjustedEnd = calendar.date(byAdding: .day, value: 1, to: end)!
+            components = calendar.dateComponents([.hour, .minute], from: start, to: adjustedEnd)
+        }
+        
+        return (components.hour ?? 0, components.minute ?? 0)
+    }
 
+
+//Bildirimlerin ayarlanması (Bildirimler 15 dk öncesi için)
     private func scheduleNotifications() {
         guard let schedule = sleepSchedule else { return }
 
